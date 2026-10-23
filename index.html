@@ -6,8 +6,14 @@
 <title>Adams' Synchronological Chart (1881)</title>
 <meta name="description" content="Zoomovací prohlížeč Adamsovy synchronologické tabulky dějin z roku 1881 — od celé tabulky až po jednotlivé pixely.">
 <meta property="og:title" content="Adams' Synchronological Chart (1881)">
-<meta property="og:description" content="Zoomovací prohlížeč Adamsovy synchronologické tabulky dějin z roku 1881.">
+<meta property="og:description" content="Sedm metrů dlouhá časová osa světových dějin z roku 1881 — přibližte si ji od celku až po jednotlivé detaily.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://petrrokyta-code.github.io/adams-chart/">
+<meta property="og:image" content="https://petrrokyta-code.github.io/adams-chart/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <style>
   html, body { margin: 0; height: 100%; background: #101114; overflow: hidden; }
   #viewer { position: absolute; inset: 0; background: #101114; }
@@ -24,13 +30,83 @@
   .navigator { background: rgba(16, 17, 20, 0.85); border: 1px solid #3a3d44 !important; }
   .displayregion { border: 2px solid #f0b94a !important; }
   #viewer canvas { outline: none; }
+
+  /* tlačítko „O mapě" v pruhu a informační panel */
+  #bar .left { display: flex; align-items: center; gap: 12px; }
+  #info-btn {
+    pointer-events: auto; cursor: pointer;
+    font: inherit; color: #c9ccd1; background: rgba(255, 255, 255, 0.08);
+    border: 1px solid #3a3d44; border-radius: 10px; padding: 3px 9px;
+  }
+  #info-btn:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+  #info {
+    position: absolute; inset: 0; z-index: 20;
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; box-sizing: border-box;
+    background: rgba(8, 9, 11, 0.55);
+  }
+  #info[hidden] { display: none; }
+  #info .card {
+    max-width: 520px; max-height: 100%; overflow-y: auto; box-sizing: border-box;
+    padding: 24px 26px 20px; border-radius: 10px;
+    background: #1b1c20; border: 1px solid #3a3d44; color: #c9ccd1;
+    font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+  #info h1 { margin: 0; font-size: 20px; line-height: 1.3; color: #f2f2f2; font-weight: 600; }
+  #info .sub { margin: 2px 0 14px; color: #f0b94a; font-size: 13px; }
+  #info h2 { margin: 16px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #8b9099; font-weight: 600; }
+  #info p { margin: 0 0 8px; }
+  #info a { color: #f0b94a; }
+  #info .source { margin-top: 14px; padding-top: 12px; border-top: 1px solid #2c2e34; font-size: 12px; color: #8b9099; }
+  #info .go {
+    display: block; width: 100%; margin-top: 16px; padding: 10px; cursor: pointer;
+    font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #101114; background: #f0b94a; border: 0; border-radius: 6px;
+  }
+  #info .go:hover { background: #f5c968; }
 </style>
 </head>
 <body>
 <div id="viewer">
   <div id="bar">
-    <span class="title">Adams' Synchronological Chart (1881)</span>
+    <span class="left">
+      <span class="title">Adams' Synchronological Chart (1881)</span>
+      <button id="info-btn" type="button" aria-controls="info">ⓘ O mapě</button>
+    </span>
     <span id="zoom">&nbsp;</span>
+  </div>
+
+  <div id="info" role="dialog" aria-modal="true" aria-labelledby="info-title">
+    <div class="card">
+      <h1 id="info-title">Adamsova synchronologická tabulka dějin</h1>
+      <div class="sub">Adams' Synchronological Chart or Map of History · vydání z roku 1881</div>
+
+      <p>Zhruba sedm metrů dlouhá nástěnná časová osa světových dějin. Sestavil ji americký
+        pedagog a presbyteriánský kazatel Sebastian C. Adams (1825–1898). Poprvé vyšla
+        v roce 1871 v Cincinnati, tady je vydání z roku 1881.</p>
+
+      <h2>Jak ji číst</h2>
+      <p>Čas běží zleva doprava, od roku 4004 př. n. l. – data stvoření světa podle biblické
+        chronologie arcibiskupa Jamese Usshera. Svislé sloupy oddělují jednotlivá století.
+        Národy a říše plynou jako barevné proudy, které se větví, slévají a zanikají.
+        Doplňují je ilustrace, seznamy panovníků a vynálezy.</p>
+
+      <h2>Ovládání</h2>
+      <p>Kolečko myši nebo dva prsty přibližují, tažením se posouváte, dvojklik přiblíží
+        místo pod kurzorem a domeček vrátí celý pohled. Přiblížit jde až na jednotlivé
+        body skenu.</p>
+
+      <div class="source">
+        Sken: David Rumsey Map Collection, přes
+        <a href="https://commons.wikimedia.org/wiki/File:Adams_Synchronological_Chart,_1881.jpg" target="_blank" rel="noopener">Wikimedia Commons</a>
+        · volné dílo (public domain).<br>
+        Více o tabulce:
+        <a href="https://en.wikipedia.org/wiki/Adams_Synchronological_Chart_or_Map_of_History" target="_blank" rel="noopener">Wikipedie (anglicky)</a>
+      </div>
+
+      <button class="go" type="button">Prohlížet mapu</button>
+    </div>
   </div>
 </div>
 
@@ -49,7 +125,18 @@
   var viewer = OpenSeadragon({
     id: "viewer",
     prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@5.0.1/build/openseadragon/images/",
-    tileSources: "tiles.dzi",
+    // obsah tiles.dzi vložený přímo, aby stránka šla otevřít i dvojklikem (file://),
+    // kde prohlížeč samostatný .dzi soubor načíst nedovolí
+    tileSources: {
+      Image: {
+        xmlns: "http://schemas.microsoft.com/deepzoom/2008",
+        Url: "tiles_files/",
+        Format: "jpg",
+        Overlap: "0",
+        TileSize: "512",
+        Size: { Width: "50195", Height: "5347" }
+      }
+    },
     drawer: "canvas",
 
     // celý pás na šířku okna, zoom nejdál na 1 : MAX_PIXEL_RATIO
@@ -100,9 +187,25 @@
       viewer.drawer.setImageSmoothingEnabled(z < 2);
     }
   }
+  // informační panel: ukáže se při otevření, zavře tlačítkem, klikem vedle nebo Esc
+  var info = document.getElementById("info");
+  function closeInfo() {
+    info.hidden = true;
+    viewer.canvas.focus();                   // klávesy +/− fungují hned
+  }
+  info.querySelector(".go").addEventListener("click", closeInfo);
+  info.addEventListener("click", function (e) { if (e.target === info) closeInfo(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !info.hidden) closeInfo();
+  });
+  document.getElementById("info-btn").addEventListener("click", function () {
+    info.hidden = false;
+    info.querySelector(".go").focus();
+  });
+
   viewer.addHandler("open", function () {
     updateZoom();
-    viewer.canvas.focus();                   // klávesy +/− fungují hned
+    if (info.hidden) viewer.canvas.focus();
   });
   // klávesy + / − podle vytištěného znaku (funguje i na české a numerické klávesnici)
   viewer.addHandler("canvas-key", function (e) {

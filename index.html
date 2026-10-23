@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Adams' Synchronological Chart (1881)</title>
+<meta name="description" content="Zoomovací prohlížeč Adamsovy synchronologické tabulky dějin z roku 1881 — od celé tabulky až po jednotlivé pixely.">
+<meta property="og:title" content="Adams' Synchronological Chart (1881)">
+<meta property="og:description" content="Zoomovací prohlížeč Adamsovy synchronologické tabulky dějin z roku 1881.">
+<meta property="og:type" content="website">
+<style>
+  html, body { margin: 0; height: 100%; background: #101114; overflow: hidden; }
+  #viewer { position: absolute; inset: 0; background: #101114; }
+  #bar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; justify-content: space-between; align-items: center;
+    height: 28px; padding: 0 14px; box-sizing: border-box;
+    background: rgba(16, 17, 20, 0.72); color: #9aa0a8;
+    font: 12px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    letter-spacing: 0.02em; pointer-events: none; user-select: none;
+  }
+  #bar .title { color: #c9ccd1; }
+  #zoom { font-variant-numeric: tabular-nums; }
+  .navigator { background: rgba(16, 17, 20, 0.85); border: 1px solid #3a3d44 !important; }
+  .displayregion { border: 2px solid #f0b94a !important; }
+  #viewer canvas { outline: none; }
+</style>
+</head>
+<body>
+<div id="viewer">
+  <div id="bar">
+    <span class="title">Adams' Synchronological Chart (1881)</span>
+    <span id="zoom">&nbsp;</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/openseadragon@5.0.1/build/openseadragon/openseadragon.min.js"></script>
+<script>
+(function () {
+  var IMAGE_ASPECT = 50195 / 5347;           // rozměry z tiles.dzi
+  var MAX_PIXEL_RATIO = 4;                   // 1 px obrázku = max. 4 px obrazovky (min. požadováno 2)
+
+  function navigatorSize() {
+    var w = Math.round(Math.min(720, Math.max(240, window.innerWidth * 0.42)));
+    return { w: w, h: Math.round(w / IMAGE_ASPECT) };
+  }
+  var nav = navigatorSize();
+
+  var viewer = OpenSeadragon({
+    id: "viewer",
+    prefixUrl: "https://cdn.jsdelivr.net/npm/openseadragon@5.0.1/build/openseadragon/images/",
+    tileSources: "tiles.dzi",
+    drawer: "canvas",
+
+    // celý pás na šířku okna, zoom nejdál na 1 : MAX_PIXEL_RATIO
+    homeFillsViewer: false,
+    minZoomImageRatio: 1,
+    maxZoomPixelRatio: MAX_PIXEL_RATIO,
+    minPixelRatio: 0.5,
+    visibilityRatio: 1,
+    constrainDuringPan: true,
+
+    // plynulost
+    animationTime: 0.9,
+    springStiffness: 8,
+    imageLoaderLimit: 8,
+    immediateRender: false,
+
+    // ovládání: klik nezoomuje, dvojklik ano
+    gestureSettingsMouse: { clickToZoom: false, dblClickToZoom: true, scrollToZoom: true },
+    gestureSettingsTouch: { pinchToZoom: true, dblClickToZoom: true },
+    zoomPerScroll: 1.35,
+    zoomPerClick: 2,
+    showNavigationControl: true,
+    showZoomControl: true,
+    showHomeControl: true,
+    showFullPageControl: true,
+    showRotationControl: false,
+
+    // minimapa: široká a nízká
+    showNavigator: true,
+    navigatorPosition: "BOTTOM_RIGHT",
+    navigatorWidth: nav.w + "px",
+    navigatorHeight: nav.h + "px",
+    navigatorAutoFade: false,
+    navigatorMaintainSizeRatio: false
+  });
+
+  // tlačítka pod nenápadným pruhem s názvem
+  viewer.controls.topleft.style.marginTop = "34px";
+
+  var zoomLabel = document.getElementById("zoom");
+
+  // 100 % = 1 px obrázku odpovídá 1 px obrazovky
+  function updateZoom() {
+    var z = viewer.viewport.viewportToImageZoom(viewer.viewport.getZoom(true));
+    zoomLabel.textContent = Math.round(z * 100) + " %";
+    // při velkém přiblížení ukaž ostré pixely místo rozmazání
+    if (viewer.drawer && viewer.drawer.setImageSmoothingEnabled) {
+      viewer.drawer.setImageSmoothingEnabled(z < 2);
+    }
+  }
+  viewer.addHandler("open", function () {
+    updateZoom();
+    viewer.canvas.focus();                   // klávesy +/− fungují hned
+  });
+  // klávesy + / − podle vytištěného znaku (funguje i na české a numerické klávesnici)
+  viewer.addHandler("canvas-key", function (e) {
+    var ev = e.originalEvent;
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+    var factor = (ev.key === "+" || ev.key === "=") ? 1.6
+               : (ev.key === "-" || ev.key === "_") ? 1 / 1.6 : null;
+    if (!factor) return;
+    e.preventDefaultAction = true;
+    viewer.viewport.zoomBy(factor);
+    viewer.viewport.applyConstraints();
+  });
+  viewer.addHandler("animation", updateZoom);
+  viewer.addHandler("zoom", updateZoom);
+
+  window.addEventListener("resize", function () {
+    var n = navigatorSize();
+    if (viewer.navigator && viewer.navigator.element) {
+      viewer.navigator.element.style.width = n.w + "px";
+      viewer.navigator.element.style.height = n.h + "px";
+      viewer.navigator.updateSize();
+    }
+  });
+})();
+</script>
+</body>
+</html>
